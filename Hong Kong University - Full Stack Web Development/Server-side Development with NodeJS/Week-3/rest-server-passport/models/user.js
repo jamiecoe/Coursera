@@ -3,8 +3,8 @@
 var mongoose = require('mongoose');
 // Create mongoose schema
 var Schema = mongoose.Schema;
-// Mongoose support plugin for models
-// Provides alot of additonal methods 
+// Passport-local-mongoose module is a Mongoose support plugin for models
+// It provides alot of additonal methods 
 var passportLocalMongoose = require('passport-local-mongoose');
 
 // User schema

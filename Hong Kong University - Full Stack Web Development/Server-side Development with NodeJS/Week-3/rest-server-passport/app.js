@@ -10,6 +10,8 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 // Bring in all configuration info
 var config = require('./config');
+
+
 // Connect to mongoDB
 mongoose.connect(config.mongoUrl);
 var db = mongoose.connection;
@@ -18,11 +20,15 @@ db.once('open', function () {
     // we're connected!
     console.log("Connected correctly to server");
 });
+
+
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var dishRouter = require('./routes/dishRouter');
 var promoRouter = require('./routes/promoRouter');
 var leaderRouter = require('./routes/leaderRouter');
+
+
 var app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -35,6 +41,9 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(cookieParser());
+
+
+
 // passport config
 // use model user.js to track users and store / manipulate in DB
 var User = require('./models/user');
@@ -45,12 +54,16 @@ app.use(passport.initialize());
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter);
 app.use('/leadership', leaderRouter);
+
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     var err = new Error('Not Found');

@@ -1,15 +1,19 @@
 // User route
 // Enable users to register, login, logout
+
+
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var User = require('../models/user');
 // verify module encapsulates everything to do with managing JSON web tokens and verfying user's identities 
 var Verify = require('./verify');
+
 /* GET users listing. */
 router.get('/', function (req, res, next) {
     res.send('respond with a resource');
 });
+
 // if users send post to /users/register, then we register a new user
 // request message should contain user register info as JSON object in the request body (bodyparser will sort this)
 router.post('/register', function (req, res) {
@@ -26,6 +30,7 @@ router.post('/register', function (req, res) {
             });
         }
         // Check new registration was successfull, only calls function if it was successsful
+        // Functions with two sets of parameters (http://stackoverflow.com/questions/18234491/two-sets-of-parentheses-after-function-call)
         passport.authenticate('local')(req, res, function () {
             return res.status(200).json({
                 status: 'Registration Successful!'
@@ -33,6 +38,7 @@ router.post('/register', function (req, res) {
         });
     });
 });
+
 // Deals with login of exisiting user, if you send POST at /users/login with username and password in the body of the message
 router.post('/login', function (req, res, next) {
     // passport.authencticate() does a 'local' authentication on user request

@@ -17,7 +17,7 @@ exports.getToken = function (user) {
 
 // Function to check token from incoming user request
 exports.verifyOrdinaryUser = function (req, res, next) {
-    // check header or url parameters or post parameters for token
+    // check request header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
     // decode token, checks its valid
@@ -44,3 +44,4 @@ exports.verifyOrdinaryUser = function (req, res, next) {
         err.status = 403;
         return next(err);
     }
+};
