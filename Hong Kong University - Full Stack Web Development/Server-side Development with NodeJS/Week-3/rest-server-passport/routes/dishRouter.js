@@ -3,6 +3,8 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
 var Dishes = require('../models/dishes');
+var Verify = require('./verify');
+
 
 // Use express router object, which is bit like a mini express application
 var dishRouter = express.Router();
@@ -16,7 +18,8 @@ dishRouter.route('/')
 
 // Chained to dishRouter.route(), no semi-colon after previous function
 // When we receive a GET request on '/' (we're requesting something) 
-.get(function(req,res,next){
+// Pass in Verify.verifyOrdinaryUser as first parameter this means the Verify middleware is applied before the callback function 
+.get(Verify.verifyOrdinaryUser, function(req,res,next){
     // Searches for all the documents ({}) in the 'dishes' collection, returned as an array called 'dish' in the callback function      
     Dishes.find({}, function (err, dish) {
         // Error check
@@ -28,7 +31,8 @@ dishRouter.route('/')
 })
 
 // When we receive a POST request on '/' (we're adding something new) 
-.post(function(req, res, next){
+// verifyOrdinaryUser must come before verfiyAdmin, as we need access to first assign token - then use it to check user's admin privilages via req.decoded
+.post(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function(req, res, next){
     // Create a new document inside 'dishes' collection
     // Use req.body as the new document in Mongo DB server
     // Callback function returns new document as 'dish' parameter, but now has '_id' property etc
@@ -47,7 +51,8 @@ dishRouter.route('/')
 })
 
 // Delete all dishes
-.delete(function(req, res, next){
+// verifyOrdinaryUser must come before verfiyAdmin, as we need access to first assign token - then use it to check user's admin privilages via req.decoded
+.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function(req, res, next){
     // Find all dishes with {} and remove them
     // resp is a javascript object which indicates how many dishes have been deleted
     Dishes.remove({}, function (err, resp) {
@@ -61,7 +66,7 @@ dishRouter.route('/')
 // define new route, with dishId
 dishRouter.route('/:dishId')
 // Chain functions
-.get(function(req,res,next){
+.get(Verify.verifyOrdinaryUser, function(req,res,next){
     // Find specific dish
     // You have access to supplied dishID with req.params.dishId
     Dishes.findById(req.params.dishId, function (err, dish) {
@@ -72,7 +77,8 @@ dishRouter.route('/:dishId')
 })
 
 // Update a pre-exsisting dish
-.put(function(req, res, next){
+// verifyOrdinaryUser must come before verfiyAdmin, as we need access to first assign token - then use it to check user's admin privilages via req.decoded
+.put(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function(req, res, next){
     // Find a dish by its ID
     // Second param specifies we want to update this dish with req.body (which should contain the updaets in JSON format)
     // Third states we want to be returned with the UPDATED dish
@@ -88,7 +94,8 @@ dishRouter.route('/:dishId')
 })
 
 // delete specific dish
-.delete(function(req, res, next){
+// verifyOrdinaryUser must come before verfiyAdmin, as we need access to first assign token - then use it to check user's admin privilages via req.decoded
+.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function(req, res, next){
     // Find dish by ID and delete it
     // resp is a javascript object which indicates which dishes has been deleted
     Dishes.findByIdAndRemove(req.params.dishId, function (err, resp) {
@@ -102,7 +109,7 @@ dishRouter.route('/:dishId')
 // define new route, for comments on specific dishes
 dishRouter.route('/:dishId/comments')
 // get all comments on a specific dish
-.get(function (req, res, next) {
+.get(Verify.verifyOrdinaryUser, function (req, res, next) {
     // Find by dishId
     Dishes.findById(req.params.dishId, function (err, dish) {
         if (err) throw err;
@@ -111,7 +118,7 @@ dishRouter.route('/:dishId/comments')
 })
 
 // Post a new comment
-.post(function (req, res, next) {
+.post(Verify.verifyOrdinaryUser, function (req, res, next) {
     // Find dish by dishId
     Dishes.findById(req.params.dishId, function (err, dish) {
         if (err) throw err;
@@ -125,8 +132,9 @@ dishRouter.route('/:dishId/comments')
     });
 })
 
-// delete comments on a specific dish
-.delete(function (req, res, next) {
+// delete all comments on a specific dish
+// verifyOrdinaryUser must come before verfiyAdmin, as we need access to first assign token - then use it to check user's admin privilages via req.decoded
+.delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
     // Find by dishId
     Dishes.findById(req.params.dishId, function (err, dish) {
         if (err) throw err;
@@ -154,7 +162,7 @@ dishRouter.route('/:dishId/comments')
 // define new route, for SPECIFIC comments on specific dishes
 dishRouter.route('/:dishId/comments/:commentId')
 // Get a specific comment 
-.get(function (req, res, next) {
+.get(Verify.verifyOrdinaryUser, function (req, res, next) {
     // Find specific dish by dishId
     Dishes.findById(req.params.dishId, function (err, dish) {
         if (err) throw err;
@@ -164,7 +172,7 @@ dishRouter.route('/:dishId/comments/:commentId')
 })
 
 // Update a specific comment
-.put(function (req, res, next) {
+.put(Verify.verifyOrdinaryUser, function (req, res, next) {
     // We delete the existing commment and insert the updated comment as a new comment
     
     // Find dish by dishId
@@ -185,7 +193,7 @@ dishRouter.route('/:dishId/comments/:commentId')
 })
 
 // Delete a specific comment
-.delete(function (req, res, next) {
+.delete(Verify.verifyOrdinaryUser, function (req, res, next) {
     // Find dish by dishID
     Dishes.findById(req.params.dishId, function (err, dish) {
         // Find comment with commentId and remove it

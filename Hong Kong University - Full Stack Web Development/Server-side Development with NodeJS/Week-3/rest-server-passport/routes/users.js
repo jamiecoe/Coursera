@@ -1,7 +1,6 @@
 // User route
 // Enable users to register, login, logout
 
-
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
@@ -9,9 +8,16 @@ var User = require('../models/user');
 // verify module encapsulates everything to do with managing JSON web tokens and verfying user's identities 
 var Verify = require('./verify');
 
-/* GET users listing. */
-router.get('/', function (req, res, next) {
-    res.send('respond with a resource');
+// Get all users (only admin)
+router.get('/', Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
+    // Search for all documents in 'user' collection, returns array called 'users' in the callback function
+    User.find({}, function (err, userDocuments) {
+        // Error check
+        if (err) throw err;
+        // Convert userDocuments array into a JSON string and put it into Response to send back to client
+        // Don't need to set header, when you call this method - status code automatically set to 200 and content type set to application/json 
+        res.json(userDocuments);
+    });
 });
 
 // if users send post to /users/register, then we register a new user

@@ -1,4 +1,4 @@
-// User Model
+// User Model 
 
 var mongoose = require('mongoose');
 // Create mongoose schema
