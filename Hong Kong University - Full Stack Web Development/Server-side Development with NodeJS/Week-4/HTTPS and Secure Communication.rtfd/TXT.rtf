@@ -1,0 +1,83 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww18820\viewh14300\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\b\fs40 \cf0 \ul \ulc0 \
+\
+\
+HTTPS and Secure Communication\
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\b0 \cf0 \ulnone - Symmetric Key Cryptography\
+- Shared secret key between two parties\
+- Only works when both sides agree on secret key\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\fs24 \cf0 {{\NeXTGraphic Screen Shot 2017-01-21 at 13.13.40.png \width18100 \height4640
+}¬}
+\fs40 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\
+- Public Key Cryptography\
+- Asymmetric Encryption\
+	- Public key can be widely distributed\
+	- Private key only known to receiver\
+- Public key cryptography expensive computationally\
+- What you can do is initially use PKC to agree on a secret key, then switch to Symmetric Key Cryptography\
+- SSL protocol uses this approach\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\fs24 \cf0 {{\NeXTGraphic Screen Shot 2017-01-21 at 13.17.51.png \width18320 \height4720
+}¬}\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\fs40 \cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+- Secure Sockets Layer (SSL) / Transport Layer Security (TLS) - Cryptography protocols that enable secure communication over an insecure network like the internet\
+- Privacy and interiority of the communication protected\
+	- Uses a combination if public key cryptography and symmetric cryptography \
+\
+\
+- SSL/TLS Handshake (CA = Certification Authority) \
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\fs24 \cf0 {{\NeXTGraphic Screen Shot 2017-01-21 at 13.28.31.png \width17780 \height8360
+}¬}\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\fs40 \cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\
+\
+- HTTPS\
+- Transmission Control Protocol / Internet Protocol (TCP / IP)\
+- Internet Protocol layer hierarchy \
+- If you run HTTP on top of SSL - when client sends an HTTP message, this message will be encrypted by SSL layer on client side. The on receiver side their server would be able to decrypt the message and pass it on to the HTTP layer\
+- HTTPS = HTTP communication on top of the SSL layer which establishes secure communication channel between client and server\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\fs24 \cf0 {{\NeXTGraphic Screen Shot 2017-01-21 at 13.34.15.png \width13200 \height6340
+}¬}\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\fs40 \cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\
+\
+- Generating Keys\
+- Use openssl for generating keys for testing (not accepted in outside world)\
+- For production environment / deploying ti a production server - you need to get keys and certificate from a certification authority (CA) e.g.: Verisign, Thawte\
+- Good book on this - \'93Computer networking: a top-down approach\'94 by James Kurose\
+\
+- In a production environment, default port number for HTTP servers is 80, the default port number for HTTPS servers is 443}

@@ -10,8 +10,6 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 // Bring in all configuration info
 var config = require('./config');
-
-
 // Connect to mongoDB
 mongoose.connect(config.mongoUrl);
 var db = mongoose.connection;
@@ -20,16 +18,29 @@ db.once('open', function () {
     // we're connected!
     console.log("Connected correctly to server");
 });
-
-
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var dishRouter = require('./routes/dishRouter');
 var promoRouter = require('./routes/promoRouter');
 var leaderRouter = require('./routes/leaderRouter');
-
-
 var app = express();
+
+// First middleware, will intercept all incoming traffic
+// '*' means this is applied to all incoming traffic
+// Secure traffic only
+app.all('*', function (req, res, next) {
+    // Log request info    
+    console.log('req start: ', req.secure, req.hostname, req.url, app.get('port'));
+    // If request is coming into the secure port to secure server    
+    if (req.secure) {
+        // Carry on as normal  
+        return next();
+    };
+    // Otherwise if request was to insecure server (localhost:3000), send back a redirect to client for the secure server url  (ie: https://localhost:3443/url)
+    // req.url gives us url from the first line of the HTTP request message
+    res.redirect('https://' + req.hostname + ':' + app.get('secPort') + req.url);
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -41,9 +52,6 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(cookieParser());
-
-
-
 // passport config
 // use model user.js to track users and store / manipulate in DB
 var User = require('./models/user');
@@ -54,16 +62,12 @@ app.use(passport.initialize());
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-
-
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 app.use('/dishes', dishRouter);
 app.use('/promotions', promoRouter);
 app.use('/leadership', leaderRouter);
-
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     var err = new Error('Not Found');
@@ -93,5 +97,4 @@ app.use(function (err, req, res, next) {
         , error: {}
     });
 });
-
 module.exports = app;
