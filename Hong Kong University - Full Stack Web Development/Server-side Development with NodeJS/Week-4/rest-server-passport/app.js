@@ -7,7 +7,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
+var authenticate = require('./authenticate');
 // Bring in all configuration info
 var config = require('./config');
 // Connect to mongoDB
@@ -52,16 +52,11 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(cookieParser());
+
 // passport config
-// use model user.js to track users and store / manipulate in DB
-var User = require('./models/user');
 // Initialise passport middleware
 app.use(passport.initialize());
-// Passport will use new local stratergy, given by User.authenticate()
-// User.authenticate() is a strategy that is exported by user.js model in which you use passport-local-mongoose plugin which supports these methods (eg: authenicate(), serializeUser(), deserializeUser())
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);

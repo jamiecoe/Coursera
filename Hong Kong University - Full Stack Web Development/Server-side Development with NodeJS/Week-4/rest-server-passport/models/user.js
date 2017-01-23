@@ -10,22 +10,24 @@ var passportLocalMongoose = require('passport-local-mongoose');
 // User schema
 // passportLocalMongoose automatically assumes username & password are going to available parts of schema. Even if you don't declare them, passportLocalMongoose will automatically insert them
 // admin is intially set to false so when a new user is created they don't have access to all features (we can give these later)
+// OAuth ID / Token is for Facebook login method
 var User = new Schema({
     username: String,
     password: String,
+    OauthId: String,
+    OauthToken: String,
     firstname: {
       type: String,
-        default: ''
+      default: ''
     },
     lastname: {
       type: String,
-        default: ''
+      default: ''
     },
     admin:   {
         type: Boolean,
         default: false
     }
-    
 });
 
 // Instance method which returns the user's fullname

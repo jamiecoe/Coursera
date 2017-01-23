@@ -1,13 +1,11 @@
 // User route
 // Enable users to register, login, logout
-
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var User = require('../models/user');
 // verify module encapsulates everything to do with managing JSON web tokens and verfying user's identities 
 var Verify = require('./verify');
-
 // Get all users (only admin)
 router.get('/', Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
     // Search for all documents in 'user' collection, returns array called 'users' in the callback function
@@ -19,7 +17,6 @@ router.get('/', Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, re
         res.json(userDocuments);
     });
 });
-
 // if users send post to /users/register, then we register a new user
 // request message should contain user register info as JSON object in the request body (bodyparser will sort this)
 router.post('/register', function (req, res) {
@@ -36,25 +33,25 @@ router.post('/register', function (req, res) {
             });
         }
         // Check first name is available and add to new user
-        if(req.body.firstname) {
+        if (req.body.firstname) {
             user.firstname = req.body.firstname;
         }
         // Check last name is available and add to new user
-        if(req.body.lastname) {
+        if (req.body.lastname) {
             user.lastname = req.body.lastname;
         }
         // Save user info, and when this is done - authenicate the new user
-        user.save(function(err,user) {
+        user.save(function (err, user) {
             // Authenicate user
             // Functions with two sets of parameters (http://stackoverflow.com/questions/18234491/two-sets-of-parentheses-after-function-call)
             passport.authenticate('local')(req, res, function () {
-                return res.status(200).json({status: 'Registration Successful!'});
+                return res.status(200).json({
+                    status: 'Registration Successful!'
+                });
             });
         });
-    
     });
 });
-
 // Deals with login of exisiting user, if you send POST at /users/login with username and password in the body of the message
 router.post('/login', function (req, res, next) {
     // passport.authencticate() does a 'local' authentication on user request
@@ -108,5 +105,40 @@ router.get('/logout', function (req, res) {
         status: 'Bye!'
     });
 });
-
+// this is the users/facebook route, if GET requested then will call a passport.authenticate with Facebook strategy
+// User will be taken to Facebook to authenticate themselves
+router.get('/facebook', passport.authenticate('facebook'), function (req, res) {});
+// Once Facebook has authenticated, it will redirect to our callback url - users/facebook/callback
+router.get('/facebook/callback', function (req, res, next) {
+    // perform passport authentication with 'facebook' strategy again
+    passport.authenticate('facebook', function (err, user, info) {
+        // Handle errors  
+        if (err) {
+            return next(err);
+        }
+        // If no user  
+        if (!user) {
+            return res.status(401).json({
+                err: info
+            });
+        }
+        // Otherwise we will login user  
+        req.logIn(user, function (err) {
+            // Error handel    
+            if (err) {
+                return res.status(500).json({
+                    err: 'Could not log in user'
+                });
+            }
+            // Get a token
+            var token = Verify.getToken(user);
+            // Return success message which includes token
+            res.status(200).json({
+                status: 'Login successful!'
+                , success: true
+                , token: token
+            });
+        });
+    })(req, res, next);
+});
 module.exports = router;
