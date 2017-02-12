@@ -14,7 +14,7 @@
       "type": "string",
       "required": true
     },
-    "category": {
+    "catergory": {
       "type": "string",
       "required": true
     },
