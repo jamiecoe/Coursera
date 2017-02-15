@@ -19,7 +19,7 @@ favoriteRouter.route('/')
         // Searches for all the documents ({}) in the 'favorites' collection
         // Populate postedBy and dishes field (ie: User info and favorite dishes)
         // returns as an array called 'favorites' in the exec function      
-        Favorites.find({}).populate('postedBy').populate('dishes').exec(function (err, favorites) {
+        Favorites.findOne({postedBy: req.decoded._doc._id}).populate('postedBy').populate('dishes').exec(function (err, favorites) {
             // Error check
             if (err) throw err;
             // Convert favorites array into a JSON string and put it into Response to send back to client
@@ -32,16 +32,15 @@ favoriteRouter.route('/')
         // Create a new document inside 'favorites' collection
         // Use req.body as the new document in Mongo DB server
         // Callback function returns new document as 'favorites' parameter, but now has '_id' property etc
-        Favorites.create(req.body, function (err, favorites) {
+        Favorites.create({
+            postedBy: req.decoded._doc._id,
+            dishes: req.body._id
+        }, function (err, favorites) {
             if (err) throw err;
             console.log('Favorite created!');
-            var id = favorites._id;
-            // Write response head
-            res.writeHead(200, {
-                'Content-Type': 'text/plain'
-            });
-            // Return response with message / dish ID
-            res.end('Added favorite with id: ' + id);
+            // Convert favorites array into a JSON string and put it into Response to send back to client
+            // Don't need to set header, when you call this method - status code automatically set to 200 and content type set to application/json
+            res.json(favorites);
         });
     });
 //    // Delete all dishes
@@ -200,3 +199,6 @@ favoriteRouter.route('/')
 //        });
 //    }); // semi-colon now completes function chain
 module.exports = favoriteRouter;
+
+
+

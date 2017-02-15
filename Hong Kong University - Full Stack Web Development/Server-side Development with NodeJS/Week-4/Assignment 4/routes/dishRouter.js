@@ -36,13 +36,7 @@ dishRouter.route('/')
         Dishes.create(req.body, function (err, dish) {
             if (err) throw err;
             console.log('Dish created!');
-            var id = dish._id;
-            // Write response head
-            res.writeHead(200, {
-                'Content-Type': 'text/plain'
-            });
-            // Return response with message / dish ID
-            res.end('Added the dish with id: ' + id);
+            res.json(dish);
         });
     })
     // Delete all dishes
