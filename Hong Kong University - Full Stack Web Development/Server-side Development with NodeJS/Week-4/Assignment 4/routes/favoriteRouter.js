@@ -1,5 +1,4 @@
 // Mongoose population example
-
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
@@ -19,7 +18,9 @@ favoriteRouter.route('/')
         // Searches for all the documents ({}) in the 'favorites' collection
         // Populate postedBy and dishes field (ie: User info and favorite dishes)
         // returns as an array called 'favorites' in the exec function      
-        Favorites.findOne({postedBy: req.decoded._doc._id}).populate('postedBy').populate('dishes').exec(function (err, favorites) {
+        Favorites.findOne({
+            postedBy: req.decoded._doc._id
+        }).populate('postedBy').populate('dishes').exec(function (err, favorites) {
             // Error check
             if (err) throw err;
             // Convert favorites array into a JSON string and put it into Response to send back to client
@@ -29,30 +30,46 @@ favoriteRouter.route('/')
     })
     // When we receive a POST request on '/' (we're adding something new) 
     .post(Verify.verifyOrdinaryUser, function (req, res, next) {
-        // Create a new document inside 'favorites' collection
-        // Use req.body as the new document in Mongo DB server
-        // Callback function returns new document as 'favorites' parameter, but now has '_id' property etc
-        Favorites.create({
-            postedBy: req.decoded._doc._id,
-            dishes: req.body._id
+        Favorites.findOne({
+            postedBy: req.decoded._doc._id
         }, function (err, favorites) {
+            
             if (err) throw err;
-            console.log('Favorite created!');
-            // Convert favorites array into a JSON string and put it into Response to send back to client
-            // Don't need to set header, when you call this method - status code automatically set to 200 and content type set to application/json
-            res.json(favorites);
+            
+            if (favorites === null) {
+                // Create a new document inside 'favorites' collection
+                // Use req.body as the new document in Mongo DB server
+                // Callback function returns new document as 'favorites' parameter, but now has '_id' property etc
+                Favorites.create({
+                    postedBy: req.decoded._doc._id
+                    , dishes: req.body._id
+                }, function (err, finishedFavorites) {
+                    if (err) throw err;
+                    console.log('Favorite created!');
+                    // Convert favorites array into a JSON string and put it into Response to send back to client
+                    // Don't need to set header, when you call this method - status code automatically set to 200 and content type set to application/json
+                    res.json(finishedFavorites);
+                });
+            }
+            else {
+                favorites.dishes.push(req.body._id);
+                
+                favorites.save(function (err, updatedFavorites) {
+                    if (err) throw err;    
+                    res.json(updatedFavorites);
+                })
+            }
         });
-    });
-//    // Delete all dishes
-//    // verifyOrdinaryUser must come before verfiyAdmin, as we need access to first assign token - then use it to check user's admin privilages via req.decoded
-//    .delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
-//        // Find all dishes with {} and remove them
-//        // resp is a javascript object which indicates how many dishes have been deleted
-//        Dishes.remove({}, function (err, resp) {
-//            if (err) throw err;
-//            res.json(resp); // Send info back to the client as JSON
-//        });
-//    }); // semi-colon now completes function chain
+    })
+    // Delete all favorite
+    .delete(Verify.verifyOrdinaryUser, function (req, res, next) {
+        // Find all favorites with {} and remove them
+        // resp is a javascript object which indicates how many dishes have been deleted
+        Favorites.remove({}, function (err, resp) {
+            if (err) throw err;
+            res.json(resp); // Send info back to the client as JSON
+        });
+    }); // semi-colon now completes function chain
 //// define new route, with dishId
 //dishRouter.route('/:dishId')
 //    // Chain functions
@@ -199,6 +216,3 @@ favoriteRouter.route('/')
 //        });
 //    }); // semi-colon now completes function chain
 module.exports = favoriteRouter;
-
-
-
