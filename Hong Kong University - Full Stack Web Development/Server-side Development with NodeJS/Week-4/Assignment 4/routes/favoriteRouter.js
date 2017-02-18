@@ -33,9 +33,7 @@ favoriteRouter.route('/')
         Favorites.findOne({
             postedBy: req.decoded._doc._id
         }, function (err, favorites) {
-            
             if (err) throw err;
-            
             if (favorites === null) {
                 // Create a new document inside 'favorites' collection
                 // Use req.body as the new document in Mongo DB server
@@ -53,9 +51,8 @@ favoriteRouter.route('/')
             }
             else {
                 favorites.dishes.push(req.body._id);
-                
                 favorites.save(function (err, updatedFavorites) {
-                    if (err) throw err;    
+                    if (err) throw err;
                     res.json(updatedFavorites);
                 })
             }
@@ -63,52 +60,32 @@ favoriteRouter.route('/')
     })
     // Delete all favorite
     .delete(Verify.verifyOrdinaryUser, function (req, res, next) {
-        // Find all favorites with {} and remove them
-        // resp is a javascript object which indicates how many dishes have been deleted
-        Favorites.remove({}, function (err, resp) {
+        Favorites.findOneAndRemove({
+            postedBy: req.decoded._doc._id
+        }, function (err, doc, result) {
             if (err) throw err;
-            res.json(resp); // Send info back to the client as JSON
+            res.json(doc);
         });
     }); // semi-colon now completes function chain
-//// define new route, with dishId
-//dishRouter.route('/:dishId')
-//    // Chain functions
-//    .get(Verify.verifyOrdinaryUser, function (req, res, next) {
-//        // Find specific dish
-//        // Populate postedBy field (ie: User info) into comments
-//        // You have access to supplied dishID with req.params.dishId
-//        Dishes.findById(req.params.dishId).populate('comments.postedBy').exec(function (err, dish) {
-//            if (err) throw err;
-//            // Return found dish and send back to client as JSON
-//            res.json(dish);
-//        });
-//    })
-//    // Update a pre-exsisting dish
-//    // verifyOrdinaryUser must come before verfiyAdmin, as we need access to first assign token - then use it to check user's admin privilages via req.decoded
-//    .put(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
-//        // Find a dish by its ID
-//        // Second param specifies we want to update this dish with req.body (which should contain the updaets in JSON format)
-//        // Third states we want to be returned with the UPDATED dish
-//        // Fourth is callback which sends updated dish back to client as JSON
-//        Dishes.findByIdAndUpdate(req.params.dishId, {
-//            $set: req.body
-//        }, {
-//            new: true
-//        }, function (err, dish) {
-//            if (err) throw err;
-//            res.json(dish);
-//        });
-//    })
-//    // delete specific dish
-//    // verifyOrdinaryUser must come before verfiyAdmin, as we need access to first assign token - then use it to check user's admin privilages via req.decoded
-//    .delete(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function (req, res, next) {
-//        // Find dish by ID and delete it
-//        // resp is a javascript object which indicates which dishes has been deleted
-//        Dishes.findByIdAndRemove(req.params.dishId, function (err, resp) {
-//            if (err) throw err;
-//            res.json(resp); // // Send info back to the client as JSON
-//        });
-//    }); // semi-colon now completes function chain
+// define new route, with dishId
+favoriteRouter.route('/:dishObjectId')
+    // delete specific favorite dish
+    .delete(Verify.verifyOrdinaryUser, function (req, res, next) {
+        // Find dish by ID and delete it
+        // resp is a javascript object which indicates which dishes has been deleted
+        Favorites.findOne({
+            postedBy: req.decoded._doc._id
+        }, function (err, favorites) {
+            var i = favorites.dishes.indexOf(req.params.dishObjectId);
+            if (i != -1) {
+                favorites.dishes.splice(i, 1);
+            }
+            favorites.save(function (err, updatedFavorites) {
+                if (err) throw err;
+                res.json(updatedFavorites);
+            });
+        });
+    }); // semi-colon now completes function chain
 //// define new route, for comments on specific dishes
 //dishRouter.route('/:dishId/comments')
 //    .all(Verify.verifyOrdinaryUser)
